@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# 1. select the project directory using fzf
+if [[ $# -eq 1 ]]; then
+    selected=$1
+else
+    selected=$(find ~/Documents/School/muni ~/Documents/School/diploma -mindepth 1 -maxdepth 1 -type d | fzf)
+fi
+
+if [[ -z $selected ]]; then
+    exit 0
+fi
+
+# 2. Get the directory name and sanitize it for tmux
+session_name=$(basename "$selected" | tr . _)
+tmux_running=$(pgrep tmux)
+
+# 3. Create or Attach logic
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+    # Start tmux and name the first window "nvim"
+    tmux new-session -s "$session_name" -c "$selected" -n "nvim"
+    exit 0
+fi
+
+if ! tmux has-session -t="$session_name" 2> /dev/null; then
+    # Create detached session and name the first window "nvim"
+    tmux new-session -ds "$session_name" -c "$selected" -n "nvim"
+fi
+
+# 4. Switch to that session
+tmux switch-client -t "$session_name"
+
