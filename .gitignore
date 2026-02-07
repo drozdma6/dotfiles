@@ -1,0 +1,7 @@
+.DS_Store
+
+# Ignore everything inside the plugins directory
+tmux/.tmux/plugins/*
+
+# Exception: Do NOT ignore the TPM directory
+!tmux/.tmux/plugins/tpm/
